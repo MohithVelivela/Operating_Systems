@@ -1,13 +1,13 @@
 #include <iostream>
 #include "libppm.h"
 #include <cstdint>
+#include <cmath>
 
 using namespace std;
 
 struct image_t* S1_smoothen(struct image_t *input_image)
 {
 	struct image_t* smooth_img = new struct image_t;
-	//uint8_t*** s_pixels;
 	int height = input_image->height;
 	int width = input_image->width;
 	smooth_img->height = height;
@@ -15,10 +15,10 @@ struct image_t* S1_smoothen(struct image_t *input_image)
 	uint8_t*** pixels = input_image->image_pixels;
 	uint8_t*** smooth = smooth_img->image_pixels;
 	smooth_img->image_pixels = new uint8_t**[height];
-	for(int i = 0; i < image->height; i++)
+	for(int i = 0; i < height; i++)
 			{
 				smooth_img->image_pixels[i] = new uint8_t*[width];
-				for(int j = 0; j < image->width; j++)
+				for(int j = 0; j < width; j++)
 					smooth_img->image_pixels[i][j] = new uint8_t[3];
 			}
 
@@ -26,32 +26,32 @@ struct image_t* S1_smoothen(struct image_t *input_image)
 			for(int j=0;j<width;j++){
 				for(int k=0;k<3;k++){
 					if(i==0 && j==0){
-						smooth_img->image_pixels[i][j][k] += pixels[i][j][k]+pixels[i][j+1][k]+pixels[i+1][j][k]+pixels[i+1][j+1][k]/4;
+						smooth_img->image_pixels[i][j][k] += uint8_t(pixels[i][j][k]+pixels[i][j+1][k]+pixels[i+1][j][k]+pixels[i+1][j+1][k]/4);
 					}
 					else if(i==0 && j==width-1){
-						smooth_img->image_pixels[i][j][k] += pixels[i][j][k]+pixels[i+1][j][k]+pixels[i][j-1][k]+pixels[i+1][j-1][k]/4;
+						smooth_img->image_pixels[i][j][k] += uint8_t(pixels[i][j][k]+pixels[i+1][j][k]+pixels[i][j-1][k]+pixels[i+1][j-1][k]/4);
 					}
 					else if(i==height-1 && j==0){
-						smooth_img->image_pixels[i][j][k] += pixels[i][j][k]+pixels[i-1][j][k]+pixels[i][j+1][k]+pixels[i-1][j+1][k]/4;
+						smooth_img->image_pixels[i][j][k] += uint8_t(pixels[i][j][k]+pixels[i-1][j][k]+pixels[i][j+1][k]+pixels[i-1][j+1][k]/4);
 					}
 					else if(i==height-1 && j==width-1){
-						smooth_img->image_pixels[i][j][k] += pixels[i][j][k]+pixels[i-1][j][k]+pixels[i][j-1][k]+pixels[i-1][j-1][k]/4;
+						smooth_img->image_pixels[i][j][k] += uint8_t(pixels[i][j][k]+pixels[i-1][j][k]+pixels[i][j-1][k]+pixels[i-1][j-1][k]/4);
 					}
 					else if(i==0 ){
-						smooth_img->image_pixels[i][j][k] += pixels[i][j][k]+pixels[i][j-1][k]+pixels[i][j+1][k]+pixels[i+1][j][k]+pixels[i+1][j-1][k]+pixels[i+1][j+1][k]/6;
+						smooth_img->image_pixels[i][j][k] += uint8_t(pixels[i][j][k]+pixels[i][j-1][k]+pixels[i][j+1][k]+pixels[i+1][j][k]+pixels[i+1][j-1][k]+pixels[i+1][j+1][k]/6);
 					}
 					else if(i==height-1){
-						smooth_img->image_pixels[i][j][k] += pixels[i][j][k]+pixels[i][j-1][k]+pixels[i][j+1][k]+pixels[i-1][j][k]+pixels[i-1][j-1][k]+pixels[i-1][j+1][k]/6;
+						smooth_img->image_pixels[i][j][k] += uint8_t(pixels[i][j][k]+pixels[i][j-1][k]+pixels[i][j+1][k]+pixels[i-1][j][k]+pixels[i-1][j-1][k]+pixels[i-1][j+1][k]/6);
 					}
 					else if(j==0){
-						smooth_img->image_pixels[i][j][k] += pixels[i][j][k]+pixels[i-1][j][k]+pixels[i+1][j][k]+pixels[i][j+1][k]+pixels[i-1][j+1][k]+pixels[i+1][j+1][k]/6;
+						smooth_img->image_pixels[i][j][k] += uint8_t(pixels[i][j][k]+pixels[i-1][j][k]+pixels[i+1][j][k]+pixels[i][j+1][k]+pixels[i-1][j+1][k]+pixels[i+1][j+1][k]/6);
 					}
 					else if(j==width-1){
-						smooth_img->image_pixels[i][j][k] += pixels[i][j][k]+pixels[i-1][j][k]+pixels[i+1][j][k]+pixels[i][j+1][k]+pixels[i-1][j+1][k]+pixels[i+1][j+1][k]/6;
+						smooth_img->image_pixels[i][j][k] += uint8_t(pixels[i][j][k]+pixels[i-1][j][k]+pixels[i+1][j][k]+pixels[i][j-1][k]+pixels[i-1][j-1][k]+pixels[i+1][j-1][k]/6);
 					}
 				else{
-					smooth_img->image_pixels[i][j][k]+= (pixels[i][j][k]+pixels[i-1][j][k]+pixels[i+1][j][k]+pixels[i][j+1][k]+pixels[i][j-1][k]
-														+pixels[i-1][j-1][k]+pixels[i-1][j+1][k]+pixels[i+1][j-1][k]+pixels[i+1][j+1][k])/9;
+					smooth_img->image_pixels[i][j][k]+= uint8_t(pixels[i][j][k]+pixels[i-1][j][k]+pixels[i+1][j][k]+pixels[i][j+1][k]+pixels[i][j-1][k]
+														+pixels[i-1][j-1][k]+pixels[i-1][j+1][k]+pixels[i+1][j-1][k]+pixels[i+1][j+1][k]/9);
 				}
 
 			}
@@ -76,7 +76,7 @@ struct image_t* S2_find_details(struct image_t *input_image, struct image_t *smo
 			for(int j=0;j<width;j++){
 				detail_img->image_pixels[i][j] = new uint8_t[3];
 				for(int k=0;k<3;k++){
-					detail_img->image_pixels[i][j][k] = pixels[i][j][k]- s_pixels[i][j][k];
+					detail_img->image_pixels[i][j][k] = abs(uint8_t(pixels[i][j][k]- s_pixels[i][j][k]));
 				}
 			}
 	}
@@ -94,18 +94,18 @@ struct image_t* S3_sharpen(struct image_t *input_image, struct image_t *details_
 	sharp->height = height;
 	sharp->width = width;
 	sharp->image_pixels = new uint8_t**[height];
-	for(int i = 0; i < image->height; i++)
+	for(int i = 0; i < height; i++)
 				{
-					smooth_img->image_pixels[i] = new uint8_t*[image->width];
-					for(int j = 0; j < image->width; j++)
-						smooth_img->image_pixels[i][j] = new uint8_t[3];
+					sharp->image_pixels[i] = new uint8_t*[width];
+					for(int j = 0; j < width; j++)
+						sharp->image_pixels[i][j] = new uint8_t[3];
 				}
 	for(int i=0;i<height;i++){
 			sharp->image_pixels[i] = new uint8_t*[width];
 			for(int j=0;j<width;j++){
 				sharp->image_pixels[i][j] = new uint8_t[3];
 				for(int k=0;k<3;k++){
-					sharp->image_pixels[i][j][k] = pixels[i][j][k] + s_pixels[i][j][k];
+					sharp->image_pixels[i][j][k] = uint8_t(pixels[i][j][k] + s_pixels[i][j][k]);
 					}
 				}
 		}
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 	struct image_t *smoothened_image = S1_smoothen(input_image);
 	struct image_t *details_image = S2_find_details(input_image, smoothened_image);
 	struct image_t *sharpened_image = S3_sharpen(input_image, details_image);
-	write_ppm_file(argv[2], sharpened_image);
+	write_ppm_file(argv[2], smoothened_image);
 	
 	return 0;
 }
